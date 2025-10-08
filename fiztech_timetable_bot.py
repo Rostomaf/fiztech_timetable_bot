@@ -1,8 +1,17 @@
-import os
+from flask import Flask
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 
 TOKEN = "8237463893:AAFi3_BPotJyUa9RIRLtVjIGAA4s5wxDnXk"
+
+app = Flask(__name__)
+
+@app.route('/')
+def index():
+    return "Bot is running!"
+
+def run_flask():
+    app.run(host='0.0.0.0', port=8080)
 
 async def show(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
