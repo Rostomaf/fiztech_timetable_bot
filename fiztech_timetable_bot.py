@@ -2,21 +2,20 @@ from flask import Flask
 from threading import Thread
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
-import asyncio
 import os
+import asyncio
 
 TOKEN = "8237463893:AAFi3_BPotJyUa9RIRLtVjIGAA4s5wxDnXk"
 
-# Flask для Render
 app = Flask(__name__)
 
 @app.route('/')
 def index():
-    return "✅ Bot is running!"
+    return "Bot is running!"
 
 def run_flask():
     port = int(os.environ.get("PORT", 8080))
-    print(f"🌐 Flask listening on port {port}")
+    print(f"Flask listening on port {port}")
     app.run(host="0.0.0.0", port=port)
 
 async def show(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -34,23 +33,26 @@ async def show(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "[Осн.Алгоритмізації](https://us05web.zoom.us/j/84393192423?pwd=5Ysrwt4RUNuKKoP7r7RpxX5DzMP7iS.1)\n"
         "[Історія](https://us02web.zoom.us/j/86720069785?pwd=ERCXI55NEmeIVFWPB4EZPuubcb6EyT.1)\n"
     )
+    await context.bot.send_message(chat_id=chat.id, text=text, parse_mode="Markdown")
 
-    await context.bot.send_message(
-        chat_id=chat.id,
-        text=text,
-        parse_mode="Markdown"
-    )
+def run_telegram():
+    async def main_bot():
+        application = ApplicationBuilder().token(TOKEN).build()
+        application.add_handler(CommandHandler("show", show))
+        await application.run_polling()
 
-async def main_bot():
-    application = ApplicationBuilder().token(TOKEN).build()
-    application.add_handler(CommandHandler("show", show))
-    await application.run_polling()
+    asyncio.run(main_bot())
 
 def main():
     # Flask у фоновому потоці
     Thread(target=run_flask, daemon=True).start()
-    # Telegram-бот
-    asyncio.run(main_bot())
+    # Telegram бот у фоновому потоці
+    Thread(target=run_telegram, daemon=True).start()
+
+    # нескінченний цикл, щоб Render не завершив процес
+    import time
+    while True:
+        time.sleep(60)
 
 if __name__ == "__main__":
     main()
