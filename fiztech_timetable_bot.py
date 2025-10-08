@@ -5,7 +5,7 @@ from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 import os
 import asyncio
 
-TOKEN = os.getenv("8237463893:AAFi3_BPotJyUa9RIRLtVjIGAA4s5wxDnXk")
+TOKEN = (os.getenv("8237463893:AAFi3_BPotJyUa9RIRLtVjIGAA4s5wxDnXk")).strip()
 
 app = Flask(__name__)
 
@@ -56,4 +56,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
