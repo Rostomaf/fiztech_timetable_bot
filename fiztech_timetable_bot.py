@@ -1,22 +1,22 @@
 from flask import Flask
-from threading import Thread
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 import os
 import asyncio
+import threading
 
+# Отримуємо токен з Render environment
 TOKEN = os.getenv("TOKEN")
 
+if not TOKEN:
+    raise ValueError("TOKEN не знайдено! Перевір Render Environment Variables.")
+
+# Ініціалізуємо Flask
 app = Flask(__name__)
 
 @app.route('/')
 def index():
-    return "Bot is running!"
-
-def run_flask():
-    port = int(os.environ.get("PORT", 8080))
-    print(f"Flask listening on port {port}")
-    app.run(host="0.0.0.0", port=port)
+    return "FizTech timetable bot is running!"
 
 async def show(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
@@ -35,24 +35,20 @@ async def show(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
     await context.bot.send_message(chat_id=chat.id, text=text, parse_mode="Markdown")
 
-def run_telegram():
-    async def main_bot():
-        application = ApplicationBuilder().token(TOKEN).build()
-        application.add_handler(CommandHandler("show", show))
-        await application.run_polling()
+async def run_telegram():
+    application = ApplicationBuilder().token(TOKEN).build()
+    application.add_handler(CommandHandler("show", show))
+    print("Telegram бот запущено")
+    await application.run_polling()
 
-    asyncio.run(main_bot())
-
-def main():
-    # Flask у фоновому потоці
-    Thread(target=run_flask, daemon=True).start()
-    # Telegram бот у фоновому потоці
-    Thread(target=run_telegram, daemon=True).start()
-
-    # нескінченний цикл, щоб Render не завершив процес
-    import time
-    while True:
-        time.sleep(60)
+def run_flask():
+    port = int(os.environ.get("PORT", 8080))
+    print(f"Flask слухає порт {port}")
+    app.run(host="0.0.0.0", port=port)
 
 if __name__ == "__main__":
-    app.run_polling()
+    # Flask у потоці
+    threading.Thread(target=run_flask, daemon=True).start()
+
+    # Telegram асинхронно в головному циклі
+    asyncio.run(run_telegram())
