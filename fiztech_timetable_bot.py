@@ -5,8 +5,7 @@ import os
 import asyncio
 import threading
 
-# Отримуємо токен з Render environment
-TOKEN = os.getenv("TOKEN")
+TOKEN = "8237463893:AAFi3_BPotJyUa9RIRLtVjIGAA4s5wxDnXk"
 
 if not TOKEN:
     raise ValueError("TOKEN не знайдено! Перевір Render Environment Variables.")
@@ -52,3 +51,4 @@ if __name__ == "__main__":
 
     # Telegram асинхронно в головному циклі
     asyncio.run(run_telegram())
+
